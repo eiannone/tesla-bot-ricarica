@@ -51,22 +51,23 @@ class BotServer(HTTPServer):
         self.path = url.path
         self.token = token
         self.chat_id = chat_id
+        self.restrict_chat_id = (chat_id > 0)
 
         HTTPServer.__init__(self, self.address, _BotRequestHandler, False)
 
     def start(self, cert_file: str, key_file: str = None):
-        log("Avvio bot server - %s:%s" % self.address)
         try:
             self.server_bind()
             self.server_activate()
+            self.socket = wrap_socket(self.socket, server_side=True, certfile=cert_file, keyfile=key_file)
         except:
             log("*** Errore. Impossibile avviare il server. ***")
             self.server_close()
             raise
 
-        wrap_socket(self.socket, server_side=True, certfile=cert_file, keyfile=key_file)
+        log("Avvio bot server - %s:%s" % self.address)
         try:
-            self.serve_forever()
+            self.serve_forever(1)
         except KeyboardInterrupt:
             pass
         self.server_close()
@@ -78,8 +79,12 @@ class BotServer(HTTPServer):
                 raise Exception("Percorso non valido")
 
             req = json.loads(req_handler.rfile.read(int(req_handler.headers['Content-Length'])))
-            if 0 < self.chat_id != req['message']['from']['id']:
-                raise Exception(f"Mittente non valido: {req['message']['from']['id']}")
+            chat_id = int(req['message']['from']['id'])
+            if not self.restrict_chat_id:
+                self.chat_id = chat_id
+            elif chat_id != self.chat_id:
+                raise Exception(f"Mittente non valido: {chat_id}")
+
             req_handler.send_ok()
             if callable(onMessage):
                 onMessage(req['message']['text'])

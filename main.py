@@ -15,9 +15,9 @@ BOT_TOKEN = "123456789:ABCDEFGHIJKLMNOPQRSTUVZ"
 BOT_CHAT_ID = 0
 
 # Percorso del file .pem con il certificato TLS/SSL
-PEM_FILE = "./file_certificato.pem"
+PEM_FILE = './chiave_pubblica.pem'
 # Percorso del file .key con la chiave privata. Opzionale se la chiave privata è già inclusa nel file .pem
-KEY_FILE = None
+KEY_FILE = './chiave_privata.key'
 
 # Comando da eseguire per l'avvio/interruzione della ricarica
 CMD_RICARICA = ["node", "/home/pi/tesla-ricarica/ricarica.js"]
@@ -47,7 +47,7 @@ def ricarica(tipo):
 def msg_ricevuto(msg):
     log(f"Ricevuto messaggio: '{msg}'")
     msg = msg.lower().strip()
-    m = re.search(r"(avvia|ricarica|stop|interrompi|arresta) all(?:e |')([\d]+)[:.]?([\d]{2}|)", msg)
+    m = re.search(r"(avvi[ao]|ricarica|stop|interrompi|arresta) all(?:e |')([\d]+)[:.]?([\d]{2}|)", msg)
     if m:
         start = (m.group(1) == "avvia" or m.group(1) == "ricarica")
         ore = int(m.group(2))
