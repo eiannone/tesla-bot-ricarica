@@ -9,7 +9,7 @@ Esempio:
 # Prerequisiti
 * **Python 3**: https://www.python.org/downloads/
 * **Creare Bot Telegram e ottenere token**. Il bot di Telegram deve essere creato interagendo con @BotFather (vedere ad esempio queste indicazioni: https://www.html.it/pag/394635/creare-telegram-bot/)
-* *(Opzionale)* **Aprire una chat col bot e ottenere id**. Impostando l'id della chat nello script è possibile l'imitare l'interazione con il bot alla sola propria chat privata. Un metodo per ottenere l'id è quello di mandare un messaggio al bot e poi aprire l'url seguente (sostituendo *##TokenBot##* con il token ottenuto al punto precedente): `https://api.telegram.org/bot##TokenBOT##/getUpdates`. L'identificativo della chat è la proprietà "id" dell'oggetto "chat".
+* *(Opzionale)* **Inviare messaggio al bot e ottenere id chat**. Impostando l'id della chat nello script è possibile l'imitare l'interazione con il bot alla sola propria  conversazione privata con il bot. Un metodo per ottenere l'id è quello di inviare un messaggio al bot e poi aprire l'url seguente (sostituendo *##TokenBot##* con il token ottenuto al punto precedente): `https://api.telegram.org/bot##TokenBOT##/getUpdates`. L'identificativo della chat è la proprietà "id" dell'oggetto "chat".
 * **Attivare Webhook per il bot**. La ricezione dei messaggi da parte del bot avviene mediante la funzione Webhook (qui le indicazioni per attivarla: https://core.telegram.org/bots/webhooks). L'argomento è un po' complesso, fare riferimento al paragrafo successivo per alcune ulteriori indicazioni.
 * **Installare script tesla-ricarica**. Lo script che effettua la ricarica va scaricato e installato a parte, si trova qui: https://github.com/eiannone/tesla-ricarica/
 
