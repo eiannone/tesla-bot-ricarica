@@ -7,17 +7,18 @@ import subprocess
 import re
 from datetime import datetime, timedelta
 
-# Url del web server che verrà contattato da Telegram
-BOT_URL = "https://0.0.0.0:443/bot-ricarica"
 # Token del Bot Telegram
 BOT_TOKEN = "123456789:ABCDEFGHIJKLMNOPQRSTUVZ"
 # (opzionale) Identificativo della chat a cui limitare la ricezione/invio dei comandi
 BOT_CHAT_ID = 0
+# Url per la funzione WebHook di Telegram ("None" per disabilitare il WebHook e usare invece getUpdates)
+BOT_URL = None  # "https://0.0.0.0:443/bot-ricarica"
 
+# SPECIFICARE I PARAMETRI SEGUENTI SOLO SE SI USA WEBHOOK
 # Percorso del file .pem con il certificato TLS/SSL
-PEM_FILE = './chiave_pubblica.pem'
+PEM_FILE = './chiave_pubblica.pem' if BOT_URL else None
 # Percorso del file .key con la chiave privata. Opzionale se la chiave privata è già inclusa nel file .pem
-KEY_FILE = './chiave_privata.key'
+KEY_FILE = './chiave_privata.key' if BOT_URL else None
 
 # Comando da eseguire per l'avvio/interruzione della ricarica
 CMD_RICARICA = ["node", "/home/pi/tesla-ricarica/ricarica.js"]
@@ -25,7 +26,7 @@ CMD_RICARICA = ["node", "/home/pi/tesla-ricarica/ricarica.js"]
 # File in cui verranno salvate le pianificazioni attive
 SCHEDULED_JOBS_FILE = "./jobs.json"
 
-bot = telegram_bot.BotServer(BOT_URL, BOT_TOKEN, BOT_CHAT_ID)
+bot = telegram_bot.BotRicarica(BOT_TOKEN, BOT_CHAT_ID, BOT_URL)
 scheduler = BackgroundScheduler()
 schedule = json.load(open(SCHEDULED_JOBS_FILE)) if path.exists(SCHEDULED_JOBS_FILE) else {"start": "", "stop": ""}
 
@@ -45,7 +46,6 @@ def ricarica(tipo):
 
 
 def msg_ricevuto(msg):
-    log(f"Ricevuto messaggio: '{msg}'")
     msg = msg.lower().strip()
     m = re.search(r"(avvi[ao]|ricarica|stop|interrompi|arresta) all(?:e |')([\d]+)[:.]?([\d]{2}|)", msg)
     if m:
