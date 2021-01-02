@@ -45,6 +45,11 @@ def ricarica(tipo):
         json.dump(schedule, outfile)
 
 
+def str_ricarica(dt: datetime, avvio: bool):
+    return "La ricarica verrà {avviata} alle ore {d.hour}:{d.minute:02d} del {d.day:02d}/{d.month:02d}/{d.year}"\
+        .format(d=dt, avviata="avviata" if avvio else "interrotta")
+
+
 def msg_ricevuto(msg):
     msg = msg.lower().strip()
     m = re.search(r"(avvi[ao]|ricarica|stop|interrompi|arresta) all(?:e |')([\d]+)[:.]?([\d]{2}|)", msg)
@@ -66,8 +71,7 @@ def msg_ricevuto(msg):
         schedule[tipo] = dt.strftime("%Y-%m-%d %H:%M:%S")
         with open(SCHEDULED_JOBS_FILE, "w") as outfile:
             json.dump(schedule, outfile)
-        bot.send_message("Ok. La ricarica verrà %s alle ore %s" %
-                         (("avviata" if start else "interrotta"), dt.strftime("%H:%M del %d/%m/%Y")))
+        bot.send_message("Ok. " + str_ricarica(dt, start))
     elif msg.startswith("annull"):
         m = re.search(r"annull[oa] (avvio|ricarica|stop|interrompi|arresta|interruzione)", msg)
         start = (m.group(1) == "avvio" or m.group(1) == "ricarica")
@@ -85,10 +89,10 @@ def msg_ricevuto(msg):
             risposta = "Pianificazione:"
             if schedule["start"] != "":
                 dt_start = datetime.strptime(schedule["start"], "%Y-%m-%d %H:%M:%S")
-                risposta += "\r\nAvvio previsto alle %s" % dt_start.strftime("%H:%M")
+                risposta += "\r\nAvvio previsto alle {d.hour}:{d.minute:02d}".format(d=dt_start)
             if schedule["stop"] != "":
                 dt_stop = datetime.strptime(schedule["stop"], "%Y-%m-%d %H:%M:%S")
-                risposta += "\r\nArresto previsto alle %s" % dt_stop.strftime("%H:%M")
+                risposta += "\r\nArresto previsto alle {d.hour}:{d.minute:02d}".format(d=dt_stop)
         bot.send_message(risposta)
     else:
         bot.send_message("Non ho capito!")
@@ -104,7 +108,6 @@ for j_tipo, strDt in schedule.items():
         continue
     d = datetime.strptime(strDt, "%Y-%m-%d %H:%M:%S")
     scheduler.add_job(ricarica, 'date', run_date=d, args=[j_tipo], id=j_tipo)
-    bot.send_message("La ricarica verrà %s alle ore %s" %
-                     (("avviata" if j_tipo == "start" else "interrotta"), d.strftime("%H:%M del %d/%m/%Y")))
+    bot.send_message(str_ricarica(d, (j_tipo == "start")))
 
 bot.start(PEM_FILE, KEY_FILE)
