@@ -67,7 +67,7 @@ def msg_ricevuto(msg):
         with open(SCHEDULED_JOBS_FILE, "w") as outfile:
             json.dump(schedule, outfile)
         bot.send_message("Ok. La ricarica verrà %s alle ore %s" %
-                         (("avviata" if start else "interrotta"), dt.strftime("%-H:%M del %d/%m/%Y")))
+                         (("avviata" if start else "interrotta"), dt.strftime("%H:%M del %d/%m/%Y")))
     elif msg.startswith("annull"):
         m = re.search(r"annull[oa] (avvio|ricarica|stop|interrompi|arresta|interruzione)", msg)
         start = (m.group(1) == "avvio" or m.group(1) == "ricarica")
@@ -85,10 +85,10 @@ def msg_ricevuto(msg):
             risposta = "Pianificazione:"
             if schedule["start"] != "":
                 dt_start = datetime.strptime(schedule["start"], "%Y-%m-%d %H:%M:%S")
-                risposta += "\r\nAvvio previsto alle %s" % dt_start.strftime("%-H:%M")
+                risposta += "\r\nAvvio previsto alle %s" % dt_start.strftime("%H:%M")
             if schedule["stop"] != "":
                 dt_stop = datetime.strptime(schedule["stop"], "%Y-%m-%d %H:%M:%S")
-                risposta += "\r\nArresto previsto alle %s" % dt_stop.strftime("%-H:%M")
+                risposta += "\r\nArresto previsto alle %s" % dt_stop.strftime("%H:%M")
         bot.send_message(risposta)
     else:
         bot.send_message("Non ho capito!")
@@ -105,6 +105,6 @@ for j_tipo, strDt in schedule.items():
     d = datetime.strptime(strDt, "%Y-%m-%d %H:%M:%S")
     scheduler.add_job(ricarica, 'date', run_date=d, args=[j_tipo], id=j_tipo)
     bot.send_message("La ricarica verrà %s alle ore %s" %
-                     (("avviata" if j_tipo == "start" else "interrotta"), d.strftime("%-H:%M del %d/%m/%Y")))
+                     (("avviata" if j_tipo == "start" else "interrotta"), d.strftime("%H:%M del %d/%m/%Y")))
 
 bot.start(PEM_FILE, KEY_FILE)

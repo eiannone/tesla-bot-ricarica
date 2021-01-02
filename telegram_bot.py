@@ -34,15 +34,15 @@ class BotRicarica:
             update_id = None
             while True:
                 try:
-                    resp = post(f"https://api.telegram.org/bot{self.token}/getUpdates", timeout=30, json={
+                    resp = post("https://api.telegram.org/bot%s/getUpdates" % self.token, timeout=30, json={
                         "offset": update_id,
                         "timeout": 10
                     })
                     if resp.status_code != 200:
-                        raise Exception(resp.reason + " (" + resp.status_code + ")")
-                    res = json.loads(resp.content)
+                        raise Exception(resp.reason + " (" + str(resp.status_code) + ")")
+                    res = json.loads(resp.content.decode('utf-8'))
                     if not res["ok"]:
-                        raise Exception(resp.content)
+                        raise Exception(resp.content.decode('utf-8'))
                     for r in res["result"]:
                         update_id = r['update_id'] + 1
                         self.receive_message(r['message']['text'], r['message']['chat']['id'])
@@ -57,19 +57,19 @@ class BotRicarica:
         if not self.restrict_chat_id:
             self.chat_id = chat_id
         elif chat_id != self.chat_id:
-            raise Exception(f"Mittente non valido: {chat_id}")
-        log(f"Ricevuto messaggio: '{msg}'")
+            raise Exception("Mittente non valido: %s" % chat_id)
+        log("Ricevuto messaggio: '%s'" % msg)
         if callable(onMessage):
             onMessage(msg)
 
     def send_message(self, msg: str, chat_id: int = 0):
-        post(f"https://api.telegram.org/bot{self.token}/sendMessage", json={
+        post("https://api.telegram.org/bot%s/sendMessage" % self.token, json={
             "chat_id": chat_id if chat_id > 0 else self.chat_id,
             "text": msg,
             "parse_mode": "HTML",
             "disable_web_page_preview": True
         })
-        log(f"Inviato messaggio: '{msg}'")
+        log("Inviato messaggio: '%s'" % msg)
 
 
 class _BotRequestHandler(BaseHTTPRequestHandler):
